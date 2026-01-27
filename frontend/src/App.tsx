@@ -39,6 +39,18 @@ function App(){
     }
   }
 
+  const deleteTask = async(id: number) => {
+    try{
+      await api.delete(`/tasks/${id}`)
+      const updatedTasks = tasks.filter(task => task.id !== id);
+      setTasks(updatedTasks);
+      
+    } catch(error){
+      console.log('Error while deleting task', error);
+    }
+
+  }
+
   return (
     <div style={{ padding: '20px'}}>
       <h1>Smart-Task-Hub</h1>
@@ -55,7 +67,15 @@ function App(){
         <p>Nincsenek feladatok...</p>
       ): (
         <ul>
-          {tasks.map(t => <li key={t.id}>{t.title}</li>)}
+          {tasks.map((t) => (
+              <li key={t.id}>
+                <span>{t.title}</span> 
+                
+                <button onClick={() => deleteTask(t.id)}>
+                  Törlés
+                </button>
+              </li>
+            ))}
         </ul>
       )}
     </div>

@@ -3,18 +3,54 @@ import api from './api';
 
 function App(){
   const [tasks, setTasks] = useState<any[]>([]);
+  const [taskTitle, setTaskTitle] = useState('');
+
+  const loadTasks = async() => {
+    try{
+      const response = await api.get('/tasks');
+      setTasks(response.data);
+    } catch(error) {
+      console.error('Hiba történt: ', error);
+    }
+  }
 
   useEffect(() => {
-    const fetchTasks = async() => {
-      const res = await api.get('/tasks');
-      setTasks(res.data);
-    };
-    fetchTasks();
-  }, []);
+    loadTasks();
+  }, [])
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    const newTask = await api.post('tasks', {title: taskTitle});
+    setTasks([...tasks, newTask.data]);
+
+    setTaskTitle('');
+  }
+
+  const addTask = async() => {
+    if(!taskTitle.trim()) return;
+
+    try{
+      const response = await api.post('/tasks', {title: taskTitle});
+      setTasks([...tasks, response.data]);
+      setTaskTitle('');
+    } catch(error){
+      console.log('Error while adding task', error);
+    }
+  }
 
   return (
     <div style={{ padding: '20px'}}>
       <h1>Smart-Task-Hub</h1>
+      <form onSubmit={handleSubmit}>
+        <input 
+          type="text"
+          value={taskTitle}
+          onChange={(e) => setTaskTitle(e.target.value)}
+          placeholder = "Új feladat megadása..."
+        />
+      </form>
+      <button onClick={addTask}>Új feladat hozzáadása</button>
       {tasks.length === 0 ? (
         <p>Nincsenek feladatok...</p>
       ): (

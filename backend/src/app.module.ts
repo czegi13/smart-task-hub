@@ -2,8 +2,7 @@ import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { TypeOrmModule } from '@nestjs/typeorm'
-import { TaskModule } from './task/task.module';
-import { Task } from './task.entity';
+import { Task } from './tasks/task.entity';
 import { TasksModule } from './tasks/tasks.module';
 
 @Module({
@@ -12,7 +11,7 @@ import { TasksModule } from './tasks/tasks.module';
     database: 'database.sqlite',
     entities: [Task],
     synchronize: true
-  }), TaskModule, TasksModule],
+  }), TasksModule, TasksModule],
   controllers: [AppController],
   providers: [AppService],
 })

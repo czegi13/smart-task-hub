@@ -12,8 +12,8 @@ export class TasksService {
         return this.repo.find();
     }
 
-    async create(title: string): Promise<Task>{
-        const newTask = this.repo.create({title});
+    async create(title: string, categoryId: number): Promise<Task>{
+        const newTask = this.repo.create({title, category: { id: categoryId}});
         return this.repo.save(newTask);
     }
 

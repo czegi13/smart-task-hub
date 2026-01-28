@@ -4,6 +4,9 @@ import api from './api';
 function App(){
   const [tasks, setTasks] = useState<any[]>([]);
   const [taskTitle, setTaskTitle] = useState('');
+  const [categories, setCategories] = useState<any[]>([]);
+  const [selectedCategory, setSelectedCategory] = useState('');
+
 
   const loadTasks = async() => {
     try{
@@ -14,9 +17,21 @@ function App(){
     }
   }
 
+  const loadCategories = async() => {
+    try{ 
+      const res = await api.get('/categories');
+      setCategories(res.data);
+    } catch(error){
+      console.log('Error while loading categories', error);
+    }
+  }
+
   useEffect(() => {
     loadTasks();
+    loadCategories();
   }, [])
+
+
 
 
   const addTask = async (e?: React.FormEvent) => {
@@ -70,6 +85,17 @@ function App(){
           onChange={(e) => setTaskTitle(e.target.value)}
           placeholder = "Új feladat megadása..."
         />
+
+        <select value={selectedCategory} onChange={(e) => setSelectedCategory(e.target.value)}>
+          <option value="">
+            Válassz kategóriát...
+          </option>
+          {categories.map((cat) => (
+            <option key={cat.id} value={cat.id}>
+              {cat.name}
+            </option>
+          ))}
+        </select>
       </form>
       <button onClick={addTask}>Új feladat hozzáadása</button>
       {tasks.length === 0 ? (

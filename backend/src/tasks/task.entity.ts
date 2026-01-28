@@ -1,5 +1,5 @@
-import { Entity, Column, PrimaryGeneratedColumn } from "typeorm";
-
+import { Entity, Column, PrimaryGeneratedColumn, ManyToOne } from "typeorm";
+import { Category } from "src/categories/entities/category.entity";
 @Entity()
 export class Task{
 
@@ -11,4 +11,7 @@ export class Task{
 
     @Column({ default: false})
     isCompleted: boolean;
+
+    @ManyToOne(() => Category, (category) => category.tasks)
+    category: Category
 }

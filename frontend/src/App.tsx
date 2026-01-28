@@ -18,16 +18,10 @@ function App(){
     loadTasks();
   }, [])
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
 
-    const newTask = await api.post('tasks', {title: taskTitle});
-    setTasks([...tasks, newTask.data]);
+  const addTask = async (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
 
-    setTaskTitle('');
-  }
-
-  const addTask = async() => {
     if(!taskTitle.trim()) return;
 
     try{
@@ -41,20 +35,35 @@ function App(){
 
   const deleteTask = async(id: number) => {
     try{
-      await api.delete(`/tasks/${id}`)
+      await api.delete(`/tasks/${id}`);
       const updatedTasks = tasks.filter(task => task.id !== id);
       setTasks(updatedTasks);
       
     } catch(error){
       console.log('Error while deleting task', error);
     }
+  }
 
+  const toggleTask = async (id: number) => {
+    try{
+      const res = await api.patch(`/tasks/${id}`);
+      
+      const updatedList = tasks.map((t) =>
+        t.id === res.data.id ? res.data : t
+      );
+
+      setTasks(updatedList);
+      
+
+    } catch(error){
+      console.log('Error while editing task', error);
+    }
   }
 
   return (
     <div style={{ padding: '20px'}}>
       <h1>Smart-Task-Hub</h1>
-      <form onSubmit={handleSubmit}>
+      <form onSubmit={addTask}>
         <input 
           type="text"
           value={taskTitle}
@@ -69,11 +78,22 @@ function App(){
         <ul>
           {tasks.map((t) => (
               <li key={t.id}>
-                <span>{t.title}</span> 
+                <span style={{ 
+                  textDecoration: t.isCompleted ? 'line-through' : 'none',
+                  color: t.isCompleted ? 'gray' : 'black' 
+                }}>
+                  {t.title}
+                </span> 
                 
                 <button onClick={() => deleteTask(t.id)}>
                   Törlés
                 </button>
+
+                <input 
+                  type="checkbox"
+                  checked={t.isCompleted}
+                  onChange={() => toggleTask(t.id)}
+                />
               </li>
             ))}
         </ul>

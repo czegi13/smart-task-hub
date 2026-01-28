@@ -26,7 +26,6 @@ export class TasksService {
     }
 
     async remove(id: number): Promise<Task> {
-        // 1. Megkeressük a törlendő elemet
         const task = await this.findOne(id);
 
         if(!task){
@@ -34,5 +33,16 @@ export class TasksService {
         }
 
         return this.repo.remove(task);
+    }
+
+    async edit(id: number): Promise<Task> {
+        const task = await this.findOne(id);
+        if(!task){
+            throw new NotFoundException('Task not found');
+        }
+
+        task.isCompleted = !task.isCompleted;
+
+        return this.repo.save(task);
     }
 }

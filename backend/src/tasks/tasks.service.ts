@@ -9,7 +9,7 @@ export class TasksService {
     constructor(@InjectRepository(Task) private repo: Repository<Task>){   }
 
     async findAll(): Promise<Task[]>{
-        return this.repo.find();
+        return this.repo.find({ relations: ['category']});
     }
 
     async create(title: string, categoryId: number): Promise<Task>{

@@ -32,17 +32,16 @@ function App(){
   }, [])
 
 
-
-
   const addTask = async (e?: React.FormEvent) => {
     if (e) e.preventDefault();
 
     if(!taskTitle.trim()) return;
 
     try{
-      const response = await api.post('/tasks', {title: taskTitle});
-      setTasks([...tasks, response.data]);
+      await api.post('/tasks', {title: taskTitle, categoryId: Number(selectedCategory)});
+      loadTasks();
       setTaskTitle('');
+      setSelectedCategory('');
     } catch(error){
       console.log('Error while adding task', error);
     }
@@ -101,28 +100,47 @@ function App(){
       {tasks.length === 0 ? (
         <p>Nincsenek feladatok...</p>
       ): (
-        <ul>
-          {tasks.map((t) => (
-              <li key={t.id}>
-                <span style={{ 
-                  textDecoration: t.isCompleted ? 'line-through' : 'none',
-                  color: t.isCompleted ? 'gray' : 'black' 
-                }}>
-                  {t.title}
-                </span> 
-                
-                <button onClick={() => deleteTask(t.id)}>
-                  Törlés
-                </button>
+        <ul style={{ listStyle: 'none', padding: 0 }}>
+  {tasks.map((t) => (
+    <li key={t.id} style={{ 
+      display: 'flex', 
+      alignItems: 'center', 
+      gap: '10px', 
+      marginBottom: '10px',
+      background: '#333',
+      padding: '10px',
+      borderRadius: '8px'
+    }}>
+      <input 
+        type="checkbox"
+        checked={t.isCompleted}
+        onChange={() => toggleTask(t.id)}
+      />
+      
+      <span style={{ 
+        flex: 1,
+        textDecoration: t.isCompleted ? 'line-through' : 'none',
+        color: t.isCompleted ? '#888' : '#fff' 
+      }}>
+        {t.title}
+        {t.category ? (
+          <b style={{ color: '#007bff', marginLeft: '8px' }}>
+            ({t.category.name})
+          </b>
+        ) : (
+          <i style={{ color: '#666', marginLeft: '8px' }}>(Nincs kategória)</i>
+        )}
+      </span>
 
-                <input 
-                  type="checkbox"
-                  checked={t.isCompleted}
-                  onChange={() => toggleTask(t.id)}
-                />
-              </li>
-            ))}
-        </ul>
+      <button 
+        onClick={() => deleteTask(t.id)}
+        style={{ backgroundColor: '#ff4444', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer' }}
+      >
+        Törlés
+      </button>
+    </li>
+  ))}
+</ul>
       )}
     </div>
   );

@@ -7,8 +7,30 @@ function App(){
   const [categories, setCategories] = useState<any[]>([]);
   const [selectedCategory, setSelectedCategory] = useState('');
   const [dueDate, setDueDate] = useState('');
+  const [priority, setPriority] = useState('medium');
 
   const todaysDate = new Date().toISOString().split('T')[0];
+
+  const priorityWeight: Record<string, number> = {
+    high: 3,
+    medium: 2,
+    low: 1
+  };
+
+  const sortedTasks = [...tasks].sort((a,b) => {
+    const weightA = priorityWeight[a.priority] || 0;
+    const weightB = priorityWeight[b.priority] || 0;
+    
+    if (weightB !== weightA) {
+      return weightB - weightA;
+    }
+
+    if (a.dueDate && b.dueDate) {
+      return new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime();
+    }
+    
+    return 0;
+  })
 
 
   const loadTasks = async() => {
@@ -41,11 +63,12 @@ function App(){
     if(!taskTitle.trim()) return;
 
     try{
-      await api.post('/tasks', {title: taskTitle, categoryId: Number(selectedCategory), dueDate: dueDate});
+      await api.post('/tasks', {title: taskTitle, categoryId: Number(selectedCategory), dueDate: dueDate, priority: priority});
       loadTasks();
       setTaskTitle('');
       setSelectedCategory('');
       setDueDate('');
+      setPriority('');
     } catch(error){
       console.log('Error while adding task', error);
     }
@@ -104,13 +127,18 @@ function App(){
           value={dueDate}
           onChange={(e) => setDueDate(e.target.value)}
         />
+        <select value={priority} onChange={(e) => setPriority(e.target.value)}>
+          <option>low</option>
+          <option>medium</option>
+          <option>high</option>
+        </select>
       </form>
       <button onClick={addTask}>Új feladat hozzáadása</button>
-      {tasks.length === 0 ? (
+      {sortedTasks.length === 0 ? (
         <p>Nincsenek feladatok...</p>
       ): (
         <ul style={{ listStyle: 'none', padding: 0 }}>
-        {tasks.map((t) => (
+        {sortedTasks.map((t) => (
           <li key={t.id} style={{ 
             display: 'flex', 
             alignItems: 'center', 
@@ -144,6 +172,24 @@ function App(){
         ) : (
           <b>Nincs megadva dátum</b>
         )}
+
+        {t.priority && (
+          <span style={{
+            fontSize: '0.75rem',
+            padding: '2px 8px',
+            borderRadius: '12px',
+            marginLeft: '10px',
+            textTransform: 'uppercase',
+            fontWeight: 'bold',
+            backgroundColor: 
+              t.priority === 'high' ? '#ff4444' : 
+              t.priority === 'medium' ? '#ffbb33' : 
+              '#00c851', 
+            color: 'white'
+          }}>
+            {t.priority}
+          </span>
+)}
       </span>
 
       <button 

@@ -32,11 +32,12 @@ function App(){
     return 0;
   })
 
-
   const loadTasks = async() => {
     try{
       const response = await api.get('/tasks');
-      setTasks(response.data);
+      if(response.data.success){
+        setTasks(response.data.data);
+      }
     } catch(error) {
       console.error('Hiba történt: ', error);
     }
@@ -45,7 +46,9 @@ function App(){
   const loadCategories = async() => {
     try{ 
       const res = await api.get('/categories');
-      setCategories(res.data);
+      if(res.data.success){
+        setCategories(res.data.data)
+      }
     } catch(error){
       console.log('Error while loading categories', error);
     }
@@ -90,7 +93,7 @@ function App(){
       const res = await api.patch(`/tasks/${id}`);
       
       const updatedList = tasks.map((t) =>
-        t.id === res.data.id ? res.data : t
+        t.id === res.data.data.id ? res.data.data : t
       );
 
       setTasks(updatedList);

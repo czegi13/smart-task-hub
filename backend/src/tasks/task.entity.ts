@@ -1,7 +1,13 @@
 import { Entity, Column, PrimaryGeneratedColumn, ManyToOne } from "typeorm";
 import { Category } from "src/categories/entities/category.entity";
+
+export enum Priority {
+    LOW = 'low',
+    MEDIUM = 'medium',
+    HIGH = 'high'
+}
 @Entity()
-export class Task{
+export class Task {
 
     @PrimaryGeneratedColumn()
     id: number;
@@ -18,4 +24,6 @@ export class Task{
     @Column({ type: 'datetime', nullable: true})
     dueDate: Date;
 
+    @Column({ enum: Priority, default: Priority.MEDIUM})
+    priority: Priority;
 }

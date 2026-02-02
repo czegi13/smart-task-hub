@@ -2,6 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Task } from './task.entity';
 import { Repository } from 'typeorm';
+import { Priority } from './task.entity';
 
 
 @Injectable()
@@ -12,10 +13,11 @@ export class TasksService {
         return this.repo.find({ relations: ['category']});
     }
 
-    async create(title: string, categoryId: number, dueDate?: string): Promise<Task>{
+    async create(title: string, categoryId: number, dueDate?: string, priority?: Priority): Promise<Task>{
         const newTask = this.repo.create({title, 
                                           category: { id: categoryId},
-                                          dueDate: dueDate ? new Date(dueDate) : undefined});
+                                          dueDate: dueDate ? new Date(dueDate) : undefined,
+                                          priority: priority});
         return this.repo.save(newTask);
     }
 

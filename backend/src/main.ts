@@ -1,7 +1,7 @@
 import { NestFactory } from '@nestjs/core';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger'; // Ezeket importáld be
 import { AppModule } from './app.module';
-
+import { TransformInterceptor } from './common/interceptors/transform.interceptors';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   app.enableCors();
@@ -18,6 +18,8 @@ async function bootstrap() {
   
   // Elérési út beállítása (pl. localhost:3000/api)
   SwaggerModule.setup('api', app, document);
+
+  app.useGlobalInterceptors(new TransformInterceptor());
 
   await app.listen(3000);
 }

@@ -6,6 +6,9 @@ function App(){
   const [taskTitle, setTaskTitle] = useState('');
   const [categories, setCategories] = useState<any[]>([]);
   const [selectedCategory, setSelectedCategory] = useState('');
+  const [dueDate, setDueDate] = useState('');
+
+  const todaysDate = new Date().toISOString().split('T')[0];
 
 
   const loadTasks = async() => {
@@ -38,10 +41,11 @@ function App(){
     if(!taskTitle.trim()) return;
 
     try{
-      await api.post('/tasks', {title: taskTitle, categoryId: Number(selectedCategory)});
+      await api.post('/tasks', {title: taskTitle, categoryId: Number(selectedCategory), dueDate: dueDate});
       loadTasks();
       setTaskTitle('');
       setSelectedCategory('');
+      setDueDate('');
     } catch(error){
       console.log('Error while adding task', error);
     }
@@ -95,22 +99,27 @@ function App(){
             </option>
           ))}
         </select>
+        <input 
+          type="date" 
+          value={dueDate}
+          onChange={(e) => setDueDate(e.target.value)}
+        />
       </form>
       <button onClick={addTask}>Új feladat hozzáadása</button>
       {tasks.length === 0 ? (
         <p>Nincsenek feladatok...</p>
       ): (
         <ul style={{ listStyle: 'none', padding: 0 }}>
-  {tasks.map((t) => (
-    <li key={t.id} style={{ 
-      display: 'flex', 
-      alignItems: 'center', 
-      gap: '10px', 
-      marginBottom: '10px',
-      background: '#333',
-      padding: '10px',
-      borderRadius: '8px'
-    }}>
+        {tasks.map((t) => (
+          <li key={t.id} style={{ 
+            display: 'flex', 
+            alignItems: 'center', 
+            gap: '10px', 
+            marginBottom: '10px',
+            background: '#333',
+            padding: '10px',
+            borderRadius: '8px'
+          }}>
       <input 
         type="checkbox"
         checked={t.isCompleted}
@@ -129,6 +138,11 @@ function App(){
           </b>
         ) : (
           <i style={{ color: '#666', marginLeft: '8px' }}>(Nincs kategória)</i>
+        )}
+        {t.dueDate ? (
+          <b style={{ color : t.dueDate.split('T')[0] < todaysDate && !t.isCompleted ? 'red' : 'inherit'}}>({t.dueDate.split('T')[0]})</b>
+        ) : (
+          <b>Nincs megadva dátum</b>
         )}
       </span>
 

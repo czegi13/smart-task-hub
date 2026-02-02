@@ -13,5 +13,9 @@ export class Task{
     isCompleted: boolean;
 
     @ManyToOne(() => Category, (category) => category.tasks)
-    category: Category
+    category: Category;
+
+    @Column({ type: 'datetime', nullable: true})
+    dueDate: Date;
+
 }

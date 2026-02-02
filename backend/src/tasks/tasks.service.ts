@@ -12,8 +12,10 @@ export class TasksService {
         return this.repo.find({ relations: ['category']});
     }
 
-    async create(title: string, categoryId: number): Promise<Task>{
-        const newTask = this.repo.create({title, category: { id: categoryId}});
+    async create(title: string, categoryId: number, dueDate?: string): Promise<Task>{
+        const newTask = this.repo.create({title, 
+                                          category: { id: categoryId},
+                                          dueDate: dueDate ? new Date(dueDate) : undefined});
         return this.repo.save(newTask);
     }
 

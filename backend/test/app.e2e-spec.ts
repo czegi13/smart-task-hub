@@ -52,4 +52,45 @@ import { TransformInterceptor } from '../src/common/interceptors/transform.inter
         }
       })
   })
- })
+
+  //3. teszt
+  it('/tasks (PATCH) - feladat státuszának módosítása', async () => {
+    const createResponse = await request(app.getHttpServer())
+      .post('/tasks')
+      .send({ title: 'Módosítandó feladat', categoryId: 3})
+      .expect(201)
+
+    return request(app.getHttpServer())
+      .patch(`/tasks/${createResponse.body.data.id}`)
+      .expect(200)
+      .expect((res) => {
+        if (res.body.data.isCompleted !== true) {
+          throw new Error('A feladat státusza nem változott true-ra!');
+        }
+      })
+  })
+
+  //4. teszt
+  it('/tasks (DELETE) - feladat törlése', async () => {
+    const createResponse = await request(app.getHttpServer())
+      .post('/tasks')
+      .send({title: 'Törlendő', categoryId: 3})
+      .expect(201)
+
+    await request(app.getHttpServer())
+      .delete(`/tasks/${createResponse.body.data.id}`)
+      .expect(200)
+
+    return request(app.getHttpServer()) 
+      .get('/tasks')
+      .expect(200)
+      .expect((res) => {
+        const tasks = res.body.data;
+
+        const found = tasks.find((t) => t.id === createResponse.body.data.id)
+        if (found) {
+          throw new Error('A feladat nem törlődött, még benne van a listában')
+        }
+      })
+  })
+})

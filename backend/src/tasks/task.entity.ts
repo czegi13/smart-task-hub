@@ -1,5 +1,5 @@
 import { Entity, Column, PrimaryGeneratedColumn, ManyToOne } from "typeorm";
-import { Category } from "../../src/categories/entities/category.entity";
+import { Category } from "../categories/entities/category.entity";
 
 export enum Priority {
     LOW = 'low',

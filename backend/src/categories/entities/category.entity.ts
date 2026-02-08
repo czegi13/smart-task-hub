@@ -1,5 +1,5 @@
 import { Entity, Column, PrimaryGeneratedColumn, OneToMany } from "typeorm";
-import { Task } from "src/tasks/task.entity";
+import { Task } from "../../tasks/task.entity";
 
 @Entity()
 export class Category {

@@ -1,11 +1,13 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication } from '@nestjs/common';
-import * as request from 'supertest';
-import { App } from 'supertest/types';
+import request from 'supertest';
 import { AppModule } from './../src/app.module';
+import { TransformInterceptor } from '../src/common/interceptors/transform.interceptor';
 
-describe('AppController (e2e)', () => {
-  let app: INestApplication<App>;
+
+
+ describe('Appcontroller (e2e)', () => {
+  let app: INestApplication;
 
   beforeEach(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
@@ -13,13 +15,41 @@ describe('AppController (e2e)', () => {
     }).compile();
 
     app = moduleFixture.createNestApplication();
+
+    app.useGlobalInterceptors(new TransformInterceptor());
+
     await app.init();
+  
   });
 
-  it('/ (GET)', () => {
+  //1. teszt
+  it('/tasks (GET) - visszaadja a listát becsomagolva', () => {
     return request(app.getHttpServer())
-      .get('/')
+      .get('/tasks')
       .expect(200)
-      .expect('Hello World!');
+      .expect((res) => {
+        if(!res.body.success) throw new Error('Hiányzik a success mező');
+        if(!res.body.timestamp) throw new Error('Hiányzik a időbélyeg');
+        if(!Array.isArray(res.body.data)) throw new Error('A data nem tömb')
+
+      });
   });
-});
+
+  //2. teszt
+  it('/tasks (POST) - létrehoz egy feladatot', () => {
+    return request(app.getHttpServer())
+      .post('/tasks')
+      .send({
+        title: 'E2E Teszt Feladat',
+        categoryId: 3,
+        priority: 'medium',
+        dueDate: '2026-03-02'
+      })
+      .expect(201)
+      .expect((res) => {
+        if (res.body.data.title !== 'E2E Teszt Feladat') {
+           throw new Error('A visszakapott cím nem egyezik!');
+        }
+      })
+  })
+ })

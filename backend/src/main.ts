@@ -1,7 +1,7 @@
 import { NestFactory } from '@nestjs/core';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger'; // Ezeket importáld be
 import { AppModule } from './app.module';
-import { TransformInterceptor } from './common/interceptors/transform.interceptors';
+import { TransformInterceptor } from './common/interceptors/transform.interceptor';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   app.enableCors();
